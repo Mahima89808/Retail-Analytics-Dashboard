@@ -1,0 +1,73 @@
+Sales:
+  - Sales
+  - Revenue
+  - Total Sales
+  - Sales Amount
+  - Gross Sales
+
+Profit:
+  - Profit
+  - Net Profit
+  - Total Profit
+  - Gross Profit
+  - Earnings
+
+Quantity:
+  - Quantity
+  - Qty
+  - Units
+  - Units Sold
+  - Quantity Sold
+
+Discount:
+  - Discount
+  - Discount %
+  - Discount Percent
+  - Discount Rate
+
+Employee Salaries:
+  - Employee Salaries
+  - Salary
+  - Salaries
+  - Payroll
+  - Employee Cost
+
+Rent:
+  - Rent
+  - Rental Cost
+  - Building Rent
+
+Electricity:
+  - Electricity
+  - Electricity Cost
+  - Utility Cost
+  - Power Cost
+
+Logistics Cost:
+  - Logistics Cost
+  - Logistics
+  - Shipping Cost
+  - Transportation Cost
+  - Freight Cost
+
+Marketing Cost:
+  - Marketing Cost
+  - Marketing Expense
+  - Advertising Cost
+  - Promotion Cost
+
+Supplier Cost:
+  - Supplier Cost
+  - Supplier Expense
+  - Procurement Cost
+  - Vendor Cost
+
+Manufacturing Cost:
+  - Manufacturing Cost
+  - Production Cost
+  - Factory Cost
+
+Warehouse Cost:
+  - Warehouse Cost
+  - Storage Cost
+  - Inventory Storage

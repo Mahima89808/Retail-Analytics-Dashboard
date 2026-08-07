@@ -1,0 +1,35 @@
+employee_salary_ratio:
+  warning: 20
+  critical: 30
+
+rent_ratio:
+  warning: 10
+  critical: 15
+
+electricity_ratio:
+  warning: 5
+  critical: 8
+
+logistics_ratio:
+  warning: 12
+  critical: 18
+
+marketing_ratio:
+  warning: 15
+  critical: 25
+
+supplier_ratio:
+  warning: 35
+  critical: 50
+
+manufacturing_ratio:
+  warning: 40
+  critical: 60
+
+warehouse_ratio:
+  warning: 10
+  critical: 15
+
+profit_margin:
+  warning: 10
+  critical: 5
