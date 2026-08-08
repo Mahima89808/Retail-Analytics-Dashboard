@@ -27,10 +27,8 @@ class AnalysisRecord:
     validation_summary: dict[str, Any]
 
     kpis: dict[str, Any]
-    insights: list[dict[str, Any]]
-    recommendations: list[dict[str, Any]]
-
-
+    insights: list[str]
+    recommendations: list[str]
 
 
 @dataclass
@@ -52,5 +50,5 @@ class SavedAnalysisRecord:
     validation_summary: dict[str, Any]
 
     kpis: dict[str, Any]
-    insights: list[dict[str, Any]]
-    recommendations: list[dict[str, Any]]
+    insights: list[str]
+    recommendations: list[str]
