@@ -14,9 +14,6 @@ from config.settings import RULES_FILE
 import yaml
 
 
-
-
-
 def _load_rules() -> dict:
     """Load business rules from rules.yaml."""
 
@@ -50,8 +47,8 @@ def evaluate_rules(kpis: dict) -> dict:
 
         value = kpis[kpi_name]
 
-        warning = thresholds["warning_threshold"]
-        critical = thresholds["critical_threshold"]
+        warning = thresholds["warning"]
+        critical = thresholds["critical"]
 
         # Profit margin: lower is worse
         if kpi_name == "profit_margin":
