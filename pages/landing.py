@@ -1,18 +1,18 @@
 """
-Landing Page
+Overview Page
 
 Responsibilities:
 - Introduce the application
 - Explain supported datasets
 - Display required and optional columns
-- Show application workflow
+- Guide the user to available pages via the sidebar
 """
 
 import streamlit as st
 
 
 def show_landing_page() -> None:
-    """Display the landing page."""
+    """Display the overview page."""
 
     st.title("📊 Retail Analytics Dashboard")
 
@@ -39,9 +39,7 @@ standard schema.
 """
     )
 
-    st.info(
-        "Supported file formats: CSV (.csv) and Excel (.xlsx)"
-    )
+    st.info("Supported file formats: CSV (.csv) and Excel (.xlsx)")
 
     st.divider()
 
@@ -73,27 +71,27 @@ standard schema.
 
     st.divider()
 
-    st.header("Workflow")
+    st.header("Navigation")
 
-    st.markdown(
-        """
-1. Upload dataset
-2. Validate dataset
-3. Map columns
-4. Generate KPIs
-5. Generate insights
-6. Generate recommendations
-7. Export report
-8. Save analysis history
-"""
-    )
+    st.write("Use the sidebar to access the following pages:")
+
+    with st.container(border=True):
+        st.subheader("🏠 Home")
+        st.write("Upload a dataset and preview it.")
+
+    with st.container(border=True):
+        st.subheader("📈 Analysis")
+        st.write("View KPIs, rule-based status, and business insights.")
+
+    with st.container(border=True):
+        st.subheader("📋 Report")
+        st.write("Review actionable recommendations for this analysis.")
+
+    with st.container(border=True):
+        st.subheader("🕘 History")
+        st.write("View, rename, or delete previously saved analyses.")
 
     st.divider()
 
-    if st.button(
-        "Enter Dashboard",
-        type="primary",
-        use_container_width=True,
-    ):
-        st.session_state.dashboard_started = True
-        st.success("Dashboard will be available after implementing the Home page.")
+    if st.button("Enter Dashboard", type="primary", use_container_width=True):
+        st.switch_page(st.session_state.pages["home"])
