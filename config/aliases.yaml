@@ -1,3 +1,7 @@
+# ==========================================================
+# Core Sales/Profit Fields (unchanged)
+# ==========================================================
+
 Sales:
   - Sales
   - Revenue
@@ -25,6 +29,11 @@ Discount:
   - Discount Percent
   - Discount Rate
 
+# ==========================================================
+# Cost Breakdown Categories (unchanged, except Logistics Cost
+# below — "Shipping Cost" alias removed, now its own field)
+# ==========================================================
+
 Employee Salaries:
   - Employee Salaries
   - Salary
@@ -46,7 +55,6 @@ Electricity:
 Logistics Cost:
   - Logistics Cost
   - Logistics
-  - Shipping Cost
   - Transportation Cost
   - Freight Cost
 
@@ -71,3 +79,114 @@ Warehouse Cost:
   - Warehouse Cost
   - Storage Cost
   - Inventory Storage
+
+# ==========================================================
+# New: Generic Cost (COGS) — distinct from the breakdown
+# categories above; a single unit/total cost figure
+# ==========================================================
+
+cost:
+  - Cost
+  - Unit Cost
+  - Cost Price
+  - COGS
+  - Cost of Goods Sold
+
+# ==========================================================
+# New: Time Field (required alongside Sales per new contract)
+# ==========================================================
+
+order_date:
+  - Order Date
+  - Transaction Date
+  - Invoice Date
+  - Purchase Date
+  - Sale Date
+
+# ==========================================================
+# New: Product Fields
+# ==========================================================
+
+category:
+  - Category
+  - Product Category
+  - Department
+  - Product Group
+
+subcategory:
+  - Sub-Category
+  - Subcategory
+  - Product Type
+  - Product Segment
+
+product_id:
+  - Product ID
+  - SKU
+  - Item ID
+  - Product Code
+
+product_name:
+  - Product Name
+  - Item Name
+  - Product
+
+# ==========================================================
+# New: Customer Fields
+# ==========================================================
+
+customer_id:
+  - Customer ID
+  - Customer Number
+  - Client ID
+
+# NOTE: document gave no alias examples for customer_name —
+# only its own canonical name included below. Flagged for you
+# to extend if your datasets use a different column name.
+customer_name:
+  - Customer Name
+
+# ==========================================================
+# New: Geographic Fields
+# ==========================================================
+
+region:
+  - Region
+  - Sales Region
+  - Territory
+
+state:
+  - State
+  - Province
+  - State Name
+
+city:
+  - City
+  - Town
+  - City Name
+
+# NOTE: document gave no alias examples for postal_code —
+# only its own canonical name included below.
+postal_code:
+  - Postal Code
+
+# NOTE: document gave no alias examples for country —
+# only its own canonical name included below.
+country:
+  - Country
+
+# ==========================================================
+# New: Shipping (now its own field, split from Logistics Cost)
+# ==========================================================
+
+shipping_cost:
+  - Shipping Cost
+  - Delivery Cost
+
+# ==========================================================
+# New: Order Identifier
+# ==========================================================
+
+order_id:
+  - Order ID
+  - Order Number
+  - Transaction ID
