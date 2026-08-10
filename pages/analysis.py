@@ -46,13 +46,27 @@ def show_analysis_page() -> None:
     # ----------------------------------------------------
     # KPIs
     # ----------------------------------------------------
+    # KPI values can be scalars (total_sales, profit_margin) or dicts
+    # (grouped KPIs like category_sales, product_sales, region_sales).
+    # Split and render separately. No Top-N/capability-report logic
+    # here — out of scope until Phase F.
+    # ----------------------------------------------------
 
     st.header("Key Performance Indicators")
 
-    kpi_items = list(kpis.items())
+    scalar_kpis = {}
+    grouped_kpis = {}
 
-    for row_start in range(0, len(kpi_items), 4):
-        row_items = kpi_items[row_start:row_start + 4]
+    for kpi_name, value in kpis.items():
+        if isinstance(value, dict):
+            grouped_kpis[kpi_name] = value
+        else:
+            scalar_kpis[kpi_name] = value
+
+    scalar_items = list(scalar_kpis.items())
+
+    for row_start in range(0, len(scalar_items), 4):
+        row_items = scalar_items[row_start:row_start + 4]
         columns = st.columns(len(row_items))
 
         for column, (kpi_name, value) in zip(columns, row_items):
@@ -64,6 +78,30 @@ def show_analysis_page() -> None:
                 display_value = f"{value:,}"
 
             column.metric(label, display_value)
+
+    if grouped_kpis:
+
+        st.subheader("Detailed Breakdowns")
+
+        for kpi_name, breakdown in grouped_kpis.items():
+            label = kpi_name.replace("_", " ").title()
+
+            st.write(f"**{label}**")
+
+            if not breakdown:
+                st.info("No data available for this breakdown.")
+                continue
+
+            sorted_items = sorted(
+                breakdown.items(), key=lambda item: item[1], reverse=True
+            )
+
+            table_rows = [
+                {"Group": group, "Value": value}
+                for group, value in sorted_items
+            ]
+
+            st.dataframe(table_rows, use_container_width=True, hide_index=True)
 
     st.divider()
 
@@ -145,3 +183,7 @@ def show_analysis_page() -> None:
     st.divider()
 
     st.info("View actionable recommendations for this dataset on the **Report** page.")
+
+    st.divider()
+    if st.button("➡️ Check the Report", type="primary", use_container_width=True):
+        st.switch_page(st.session_state.pages["report"])
