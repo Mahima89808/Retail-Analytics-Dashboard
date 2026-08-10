@@ -1,35 +1,154 @@
+
 employee_salary_ratio:
   warning: 20
   critical: 30
+
 
 rent_ratio:
   warning: 10
   critical: 15
 
+
 electricity_ratio:
   warning: 5
   critical: 8
+
 
 logistics_ratio:
   warning: 12
   critical: 18
 
+
 marketing_ratio:
   warning: 15
   critical: 25
+
 
 supplier_ratio:
   warning: 35
   critical: 50
 
+
 manufacturing_ratio:
   warning: 40
   critical: 60
+
 
 warehouse_ratio:
   warning: 10
   critical: 15
 
+
 profit_margin:
   warning: 10
   critical: 5
+  direction: lower
+
+
+category_profit_margin:
+  type: grouped_ratio
+  numerator: category_profit
+  denominator: category_sales
+  warning: 10
+  critical: 5
+  direction: lower
+
+
+category_sales_concentration:
+  type: grouped_ratio
+  numerator: category_sales
+  denominator: total_sales
+  warning: 40
+  critical: 60
+  direction: higher
+
+
+subcategory_profit_margin:
+  type: grouped_ratio
+  numerator: subcategory_profit
+  denominator: subcategory_sales
+  warning: 10
+  critical: 5
+  direction: lower
+
+
+subcategory_sales_concentration:
+  type: grouped_ratio
+  numerator: subcategory_sales
+  denominator: total_sales
+  warning: 20
+  critical: 35
+  direction: higher
+
+
+region_profit_margin:
+  type: grouped_ratio
+  numerator: region_profit
+  denominator: region_sales
+  warning: 10
+  critical: 5
+  direction: lower
+
+
+region_sales_concentration:
+  type: grouped_ratio
+  numerator: region_sales
+  denominator: total_sales
+  warning: 40
+  critical: 60
+  direction: higher
+
+
+state_profit_margin:
+  type: grouped_ratio
+  numerator: state_profit
+  denominator: state_sales
+  warning: 10
+  critical: 5
+  direction: lower
+
+
+state_sales_concentration:
+  type: grouped_ratio
+  numerator: state_sales
+  denominator: total_sales
+  warning: 40
+  critical: 60
+  direction: higher
+
+
+city_profit_margin:
+  type: grouped_ratio
+  numerator: city_profit
+  denominator: city_sales
+  warning: 10
+  critical: 5
+  direction: lower
+
+
+city_sales_concentration:
+  type: grouped_ratio
+  numerator: city_sales
+  denominator: total_sales
+  warning: 40
+  critical: 60
+  direction: higher
+
+
+country_profit_margin:
+  type: grouped_ratio
+  numerator: country_profit
+  denominator: country_sales
+  warning: 10
+  critical: 5
+  direction: lower
+
+
+country_sales_concentration:
+  type: grouped_ratio
+  numerator: country_sales
+  denominator: total_sales
+  warning: 40
+  critical: 60
+  direction: higher
+
