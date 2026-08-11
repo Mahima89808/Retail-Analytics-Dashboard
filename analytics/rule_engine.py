@@ -86,17 +86,12 @@ def _evaluate_scalar_rule(
     """
     Evaluate a scalar KPI rule.
 
-    Existing scalar rules default to "higher is worse" for backward
-    compatibility. Rules can explicitly provide a direction in YAML.
+    Rules must explicitly define their direction in rules.yaml.
     """
 
     warning = thresholds["warning"]
     critical = thresholds["critical"]
-
-    direction = thresholds.get("direction")
-
-    if direction is None:
-        direction = "lower" if kpi_name == "profit_margin" else "higher"
+    direction = thresholds["direction"]
 
     status = _evaluate_status(
         value=value,
@@ -106,8 +101,10 @@ def _evaluate_scalar_rule(
     )
 
     return {
+        "rule_type": "scalar",
         "value": round(value, 2),
         "status": status,
+        "direction": direction,
         "warning_threshold": warning,
         "critical_threshold": critical,
     }
@@ -122,26 +119,26 @@ def _evaluate_grouped_rule(
 
     A grouped rule derives one value per group from configured source KPIs.
 
-    For example:
-
+    Examples
+    --------
     category_profit_margin
         category_profit / category_sales
 
     category_sales_concentration
         category_sales / total_sales
 
-    Only groups that violate the configured rule are returned.
+    Applicability is controlled by the configured "min_groups"
+    threshold. Concentration rules use min_groups: 2 so that a
+    single-group dataset is reported as "not_applicable".
 
-    Concentration rules are evaluated only when at least two groups
-    are present. A single-group dataset represents complete coverage
-    of that dimension rather than meaningful concentration.
+    Profit-margin rules do not require multiple groups and therefore
+    remain meaningful when only one group exists.
 
     Returns
     -------
     dict | None
-        Structured grouped-rule result, or None when the required KPI
-        sources are unavailable or the rule cannot be meaningfully
-        evaluated.
+        Structured grouped-rule result, or None when the required
+        KPI sources are unavailable.
     """
 
     numerator_name = thresholds["numerator"]
@@ -160,13 +157,23 @@ def _evaluate_grouped_rule(
     warning = thresholds["warning"]
     critical = thresholds["critical"]
 
-    is_concentration_rule = (
-        numerator_name.endswith("_sales")
-        and denominator_name == "total_sales"
-    )
+    min_groups = thresholds.get("min_groups", 1)
 
-    if is_concentration_rule and len(numerator) < 2:
-        return None
+    if len(numerator) < min_groups:
+        return {
+            "rule_type": "grouped",
+            "status": "not_applicable",
+            "direction": direction,
+            "reason": (
+                f"Only {len(numerator)} group(s) are present; "
+                f"at least {min_groups} group(s) are required "
+                "for this rule to have a meaningful business "
+                "interpretation."
+            ),
+            "warning_threshold": warning,
+            "critical_threshold": critical,
+            "violations": [],
+        }
 
     violations = []
 
@@ -185,7 +192,10 @@ def _evaluate_grouped_rule(
             if denominator_value == 0:
                 continue
 
-            value = (numerator[group] / denominator_value) * 100
+            value = (
+                numerator[group]
+                / denominator_value
+            ) * 100
 
             status = _evaluate_status(
                 value=value,
@@ -210,7 +220,10 @@ def _evaluate_grouped_rule(
 
         for group, numerator_value in numerator.items():
 
-            value = (numerator_value / denominator) * 100
+            value = (
+                numerator_value
+                / denominator
+            ) * 100
 
             status = _evaluate_status(
                 value=value,
@@ -243,6 +256,7 @@ def _evaluate_grouped_rule(
     return {
         "rule_type": "grouped",
         "status": status,
+        "direction": direction,
         "warning_threshold": warning,
         "critical_threshold": critical,
         "violations": violations,
@@ -299,4 +313,3 @@ def evaluate_rules(kpis: dict) -> dict:
         )
 
     return results
-
