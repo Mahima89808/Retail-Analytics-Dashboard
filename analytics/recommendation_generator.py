@@ -96,7 +96,10 @@ def generate_recommendations(rule_results: dict) -> List[str]:
 
     for metric, result in rule_results.items():
 
-        if result["status"] == "normal":
+        # "not_applicable" is not a violation — skip it exactly like
+        # "normal", so an insufficient-groups concentration rule never
+        # produces a recommendation.
+        if result["status"] in ("normal", "not_applicable"):
             continue
 
         recommendation = RECOMMENDATIONS.get(metric)
@@ -105,4 +108,3 @@ def generate_recommendations(rule_results: dict) -> List[str]:
             recommendations.append(recommendation)
 
     return recommendations
-
