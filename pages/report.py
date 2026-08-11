@@ -44,8 +44,8 @@ def show_report_page() -> None:
         st.success("No recommendations at this time. All metrics are within normal range.")
     else:
         for recommendation in recommendations:
-            st.write(f"- {recommendation}")
-
+            clean_recommendation = str(recommendation).lstrip("*- ").strip()
+            st.markdown(f"- {clean_recommendation}")
     st.divider()
     st.header("Export")
 
