@@ -1,49 +1,47 @@
-
 employee_salary_ratio:
   warning: 20
   critical: 30
-
+  direction: higher
 
 rent_ratio:
   warning: 10
   critical: 15
-
+  direction: higher
 
 electricity_ratio:
   warning: 5
   critical: 8
-
+  direction: higher
 
 logistics_ratio:
   warning: 12
   critical: 18
-
+  direction: higher
 
 marketing_ratio:
   warning: 15
   critical: 25
-
+  direction: higher
 
 supplier_ratio:
   warning: 35
   critical: 50
-
+  direction: higher
 
 manufacturing_ratio:
   warning: 40
   critical: 60
-
+  direction: higher
 
 warehouse_ratio:
   warning: 10
   critical: 15
-
+  direction: higher
 
 profit_margin:
   warning: 10
   critical: 5
   direction: lower
-
 
 category_profit_margin:
   type: grouped_ratio
@@ -53,7 +51,6 @@ category_profit_margin:
   critical: 5
   direction: lower
 
-
 category_sales_concentration:
   type: grouped_ratio
   numerator: category_sales
@@ -61,7 +58,7 @@ category_sales_concentration:
   warning: 40
   critical: 60
   direction: higher
-
+  min_groups: 2
 
 subcategory_profit_margin:
   type: grouped_ratio
@@ -71,7 +68,6 @@ subcategory_profit_margin:
   critical: 5
   direction: lower
 
-
 subcategory_sales_concentration:
   type: grouped_ratio
   numerator: subcategory_sales
@@ -79,7 +75,7 @@ subcategory_sales_concentration:
   warning: 20
   critical: 35
   direction: higher
-
+  min_groups: 2
 
 region_profit_margin:
   type: grouped_ratio
@@ -89,7 +85,6 @@ region_profit_margin:
   critical: 5
   direction: lower
 
-
 region_sales_concentration:
   type: grouped_ratio
   numerator: region_sales
@@ -97,7 +92,7 @@ region_sales_concentration:
   warning: 40
   critical: 60
   direction: higher
-
+  min_groups: 2
 
 state_profit_margin:
   type: grouped_ratio
@@ -107,7 +102,6 @@ state_profit_margin:
   critical: 5
   direction: lower
 
-
 state_sales_concentration:
   type: grouped_ratio
   numerator: state_sales
@@ -115,7 +109,7 @@ state_sales_concentration:
   warning: 40
   critical: 60
   direction: higher
-
+  min_groups: 2
 
 city_profit_margin:
   type: grouped_ratio
@@ -125,7 +119,6 @@ city_profit_margin:
   critical: 5
   direction: lower
 
-
 city_sales_concentration:
   type: grouped_ratio
   numerator: city_sales
@@ -133,7 +126,7 @@ city_sales_concentration:
   warning: 40
   critical: 60
   direction: higher
-
+  min_groups: 2
 
 country_profit_margin:
   type: grouped_ratio
@@ -143,7 +136,6 @@ country_profit_margin:
   critical: 5
   direction: lower
 
-
 country_sales_concentration:
   type: grouped_ratio
   numerator: country_sales
@@ -151,4 +143,4 @@ country_sales_concentration:
   warning: 40
   critical: 60
   direction: higher
-
+  min_groups: 2
