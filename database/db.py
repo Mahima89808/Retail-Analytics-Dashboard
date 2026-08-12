@@ -2,20 +2,21 @@
 Database connection module.
 
 Responsibilities:
-- Load environment variables
-- Validate configuration
-- Create and expose a reusable Supabase client
+
+- Load environment variables.
+- Validate Supabase configuration.
+- Create and expose a reusable Supabase client.
 
 No business logic or database queries belong here.
 """
 
+import os
+
 from dotenv import load_dotenv
 from supabase import Client, create_client
 
-import os
 
-
-# Load environment variables from .env
+# Load environment variables from .env.
 load_dotenv()
 
 
