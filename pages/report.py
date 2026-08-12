@@ -90,3 +90,17 @@ def show_report_page() -> None:
             )
         else:
             st.caption("Dataset unavailable for export (not found in session).")
+
+    st.info(
+        "Checkout the saved Analysis "
+        
+    )
+    if st.button(
+        "➡️ History",
+        type="primary",
+        use_container_width=True,
+    ):
+
+        st.switch_page(
+            st.session_state.pages["history"]
+        )
