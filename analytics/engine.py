@@ -14,13 +14,19 @@ from analytics.insight_generator import generate_insights
 from analytics.recommendation_generator import generate_recommendations
 
 
-def run_analysis(dataframe):
+def run_analysis(dataframe, threshold_overrides=None):
     """
     Run the complete analytics pipeline.
 
     Parameters
     ----------
     dataframe : pandas.DataFrame
+    threshold_overrides : dict | None, optional
+        Optional per-session threshold overrides forwarded directly
+        to analytics.rule_engine.evaluate_rules(). See that function's
+        docstring for the accepted shape and validation rules. When
+        None (the default), behavior is identical to the pipeline
+        before this parameter existed.
 
     Returns
     -------
@@ -29,7 +35,7 @@ def run_analysis(dataframe):
 
     kpis = calculate_kpis(dataframe)
 
-    rule_results = evaluate_rules(kpis)
+    rule_results = evaluate_rules(kpis, threshold_overrides=threshold_overrides)
 
     insights = generate_insights(rule_results)
 
