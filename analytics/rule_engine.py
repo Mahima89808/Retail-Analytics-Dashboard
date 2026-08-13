@@ -7,6 +7,8 @@ Responsibilities:
 - Compare scalar KPI values against configured thresholds.
 - Evaluate grouped KPI rules using configured source KPIs.
 - Return structured rule evaluation results.
+- Accept optional per-session threshold overrides supplied by the UI
+  layer, without ever modifying config/rules.yaml.
 """
 
 # Standard library imports
@@ -18,11 +20,102 @@ from config.settings import RULES_FILE
 import yaml
 
 
+# Fields that describe what a rule IS, not a business threshold choice.
+# These can never be changed by an override.
+_STRUCTURAL_FIELDS = {
+    "type",
+    "numerator",
+    "denominator",
+    "direction",
+    "min_groups",
+}
+
+# Fields an override is permitted to change.
+_OVERRIDABLE_FIELDS = {
+    "warning",
+    "critical",
+}
+
+
 def _load_rules() -> dict:
     """Load business rules from rules.yaml."""
 
     with open(RULES_FILE, "r", encoding="utf-8") as file:
         return yaml.safe_load(file)
+
+
+def _apply_overrides(
+    rules: dict,
+    threshold_overrides: dict | None,
+) -> dict:
+    """
+    Apply optional per-session threshold overrides on top of the
+    rules loaded from rules.yaml.
+
+    rules.yaml remains the source of truth for which rules exist and
+    for every structural field (type, numerator, denominator,
+    direction, min_groups). Overrides may only change "warning" and
+    "critical" values, and only for rules that already exist in
+    rules.yaml.
+
+    Parameters
+    ----------
+    rules : dict
+        Rules dictionary as loaded from rules.yaml.
+    threshold_overrides : dict | None
+        Optional mapping of rule name to a dict containing "warning"
+        and/or "critical" override values.
+
+    Returns
+    -------
+    dict
+        A new rules dictionary with overrides applied. The original
+        `rules` dictionary is not mutated.
+
+    Raises
+    ------
+    ValueError
+        If an override references a rule name that does not exist
+        in rules.yaml, or attempts to change a field other than
+        "warning"/"critical".
+    """
+
+    if not threshold_overrides:
+        return rules
+
+    merged_rules = {
+        rule_name: dict(thresholds)
+        for rule_name, thresholds in rules.items()
+    }
+
+    for rule_name, override_fields in threshold_overrides.items():
+
+        if rule_name not in merged_rules:
+            raise ValueError(
+                f"Unknown rule name in threshold_overrides: "
+                f"{rule_name!r}. This rule does not exist in "
+                "rules.yaml. Overrides may only target existing "
+                "rules."
+            )
+
+        invalid_fields = (
+            set(override_fields.keys()) - _OVERRIDABLE_FIELDS
+        )
+
+        if invalid_fields:
+            raise ValueError(
+                f"Invalid override field(s) for rule "
+                f"{rule_name!r}: {sorted(invalid_fields)}. "
+                f"Overrides may only change "
+                f"{sorted(_OVERRIDABLE_FIELDS)}. Fields such as "
+                f"type, numerator, denominator, direction, and "
+                f"min_groups are defined by rules.yaml and cannot "
+                "be overridden."
+            )
+
+        merged_rules[rule_name].update(override_fields)
+
+    return merged_rules
 
 
 def _evaluate_status(
@@ -263,7 +356,10 @@ def _evaluate_grouped_rule(
     }
 
 
-def evaluate_rules(kpis: dict) -> dict:
+def evaluate_rules(
+    kpis: dict,
+    threshold_overrides: dict | None = None,
+) -> dict:
     """
     Evaluate KPIs against configured rules.
 
@@ -271,14 +367,42 @@ def evaluate_rules(kpis: dict) -> dict:
     ----------
     kpis : dict
         KPI dictionary from kpi_engine.py.
+    threshold_overrides : dict | None, optional
+        Optional per-session override of "warning" and/or "critical"
+        threshold values, keyed by rule name, e.g.:
+
+            {
+                "profit_margin": {"warning": 12, "critical": 6},
+                "category_sales_concentration": {"warning": 35},
+            }
+
+        rules.yaml remains the source of truth for which rules
+        exist and for all structural fields (type, numerator,
+        denominator, direction, min_groups) — those cannot be
+        overridden. rules.yaml itself is never modified; overrides
+        apply only in memory for this evaluation call. When None
+        (the default), behavior is identical to having no overrides
+        at all.
 
     Returns
     -------
     dict
         Structured rule evaluation results.
+
+    Raises
+    ------
+    ValueError
+        If threshold_overrides references a rule name that does not
+        exist in rules.yaml, or attempts to override a field other
+        than "warning"/"critical".
     """
 
     rules = _load_rules()
+
+    rules = _apply_overrides(
+        rules=rules,
+        threshold_overrides=threshold_overrides,
+    )
 
     results = {}
 
