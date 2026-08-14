@@ -44,6 +44,64 @@ def _load_rules() -> dict:
         return yaml.safe_load(file)
 
 
+def get_applicable_rules(kpis: dict) -> dict:
+    """
+    Return configured rules that are applicable to the supplied KPIs.
+
+    Applicability is determined by whether the KPIs required by the
+    rule definition are available.
+
+    This function does not evaluate rules and does not apply threshold
+    overrides.
+
+    Parameters
+    ----------
+    kpis : dict
+        KPI dictionary produced by kpi_engine.py.
+
+    Returns
+    -------
+    dict
+        Mapping of applicable rule names to their rule definitions.
+
+    Notes
+    -----
+    For scalar rules, the rule is applicable when its rule name exists
+    in the KPI dictionary.
+
+    For grouped_ratio rules, the rule is applicable when both its
+    numerator and denominator KPI sources exist.
+
+    The rule's min_groups value does not determine configurability.
+    A rule may be configurable while its evaluation result is
+    "not_applicable" because the dataset contains too few groups.
+    """
+
+    rules = _load_rules()
+    applicable_rules = {}
+
+    for rule_name, thresholds in rules.items():
+
+        rule_type = thresholds.get("type")
+
+        if rule_type == "grouped_ratio":
+
+            numerator_name = thresholds.get("numerator")
+            denominator_name = thresholds.get("denominator")
+
+            if (
+                numerator_name in kpis
+                and denominator_name in kpis
+            ):
+                applicable_rules[rule_name] = thresholds
+
+            continue
+
+        if rule_name in kpis:
+            applicable_rules[rule_name] = thresholds
+
+    return applicable_rules
+
 def _apply_overrides(
     rules: dict,
     threshold_overrides: dict | None,
