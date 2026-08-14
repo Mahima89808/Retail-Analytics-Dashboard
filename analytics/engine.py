@@ -14,6 +14,27 @@ from analytics.insight_generator import generate_insights
 from analytics.recommendation_generator import generate_recommendations
 
 
+def get_kpis(dataframe):
+    """
+    Calculate KPIs for a dataset without running rule evaluation.
+
+    Exists so pages can determine which rules are applicable (via
+    analytics.rule_engine.get_applicable_rules) before running the
+    full pipeline, without importing analytics.kpi_engine directly.
+    Pages should depend only on analytics.engine.
+
+    Parameters
+    ----------
+    dataframe : pandas.DataFrame
+
+    Returns
+    -------
+    dict
+    """
+
+    return calculate_kpis(dataframe)
+
+
 def run_analysis(dataframe, threshold_overrides=None):
     """
     Run the complete analytics pipeline.
