@@ -2,10 +2,11 @@
 Repository layer.
 
 Responsibilities:
-- Insert analysis records
-- Read analysis records
-- Update analysis records
-- Delete analysis records
+
+- Insert analysis records.
+- Read analysis records.
+- Update analysis records.
+- Delete analysis records.
 
 This is the ONLY module that communicates directly with Supabase.
 """
@@ -83,7 +84,9 @@ def get_all_analyses() -> list[SavedAnalysisRecord]:
     return [_to_saved_record(item) for item in response.data]
 
 
-def get_analysis_by_id(record_id: str) -> SavedAnalysisRecord | None:
+def get_analysis_by_id(
+    record_id: str,
+) -> SavedAnalysisRecord | None:
     """
     Return one analysis by its ID.
     """
@@ -103,7 +106,10 @@ def get_analysis_by_id(record_id: str) -> SavedAnalysisRecord | None:
     return _to_saved_record(response.data[0])
 
 
-def rename_analysis(record_id: str, new_name: str) -> bool:
+def rename_analysis(
+    record_id: str,
+    new_name: str,
+) -> bool:
     """
     Rename a saved analysis.
     """
