@@ -33,8 +33,10 @@ import streamlit as st
 # Local application imports
 
 from analytics.engine import run_analysis
+from analytics.rule_engine import get_applicable_rules
 from database.models import AnalysisRecord
 from database.repository import save_analysis
+from analytics.kpi_engine import calculate_kpis
 
 
 # ----------------------------------------------------
@@ -191,6 +193,205 @@ def _format_threshold(
 
     return formatted_value
 
+
+def _display_threshold_configuration(
+    applicable_rules: dict,
+) -> None:
+    """Display threshold controls for applicable rules."""
+
+    if not applicable_rules:
+        return
+
+    st.subheader("Threshold Configuration")
+
+    st.caption(
+        "Configure the business thresholds used by the rule engine. "
+        "Changes apply to this session."
+    )
+
+    overrides = st.session_state.threshold_overrides
+
+    for rule_name, rule in applicable_rules.items():
+
+        label = _display_label(rule_name)
+
+        default_warning = float(rule["warning"])
+        default_critical = float(rule["critical"])
+
+        custom = overrides.get(rule_name, {})
+
+        current_warning = float(
+            custom.get("warning", default_warning)
+        )
+
+        current_critical = float(
+            custom.get("critical", default_critical)
+        )
+
+        st.markdown(f"**{label}**")
+
+        warning_key = f"threshold_{rule_name}_warning"
+        critical_key = f"threshold_{rule_name}_critical"
+
+        warning_value = st.number_input(
+            "Warning threshold (%)",
+            value=current_warning,
+            step=0.5,
+            key=warning_key,
+            on_change=_update_threshold_override,
+            args=(
+                rule_name,
+                "warning",
+                current_warning,
+                default_warning,
+            ),
+        )
+
+        critical_value = st.number_input(
+            "Critical threshold (%)",
+            value=current_critical,
+            step=0.5,
+            key=critical_key,
+            on_change=_update_threshold_override,
+            args=(
+                rule_name,
+                "critical",
+                current_critical,
+                default_critical,
+            ),
+        )
+
+        is_custom = rule_name in overrides
+
+        if is_custom:
+            st.caption(
+                "Custom threshold  •  "
+                f"Default: Warning "
+                f"{default_warning:.2f}% | "
+                f"Critical {default_critical:.2f}%"
+            )
+
+        st.divider()
+
+
+def _initialize_threshold_overrides() -> None:
+    """Initialize per-session threshold overrides."""
+    if "threshold_overrides" not in st.session_state:
+        st.session_state.threshold_overrides = {}
+
+
+
+def _update_threshold_override(
+    rule_name: str,
+    field: str,
+    value: float,
+    default_value: float,
+) -> None:
+    """
+    Update one threshold override in session state.
+
+    Only values that differ from the configured default are stored.
+    If the value is restored to the default, the override is removed.
+    """
+
+    overrides = st.session_state.threshold_overrides
+
+    if value == default_value:
+        if rule_name in overrides:
+            overrides[rule_name].pop(field, None)
+
+            if not overrides[rule_name]:
+                del overrides[rule_name]
+
+        return
+
+    overrides.setdefault(rule_name, {})
+    overrides[rule_name][field] = value
+
+
+
+def _display_threshold_configuration(
+    applicable_rules: dict,
+) -> None:
+    """Display threshold controls for applicable rules."""
+
+    if not applicable_rules:
+        return
+
+    st.subheader("Threshold Configuration")
+
+    st.caption(
+        "Configure the business thresholds used by the rule engine. "
+        "Changes apply to this session."
+    )
+
+    overrides = st.session_state.threshold_overrides
+
+    for rule_name, rule in applicable_rules.items():
+
+        label = _display_label(rule_name)
+
+        default_warning = float(rule["warning"])
+        default_critical = float(rule["critical"])
+
+        custom = overrides.get(rule_name, {})
+
+        current_warning = float(
+            custom.get("warning", default_warning)
+        )
+
+        current_critical = float(
+            custom.get("critical", default_critical)
+        )
+
+        st.markdown(f"**{label}**")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            warning_value = st.number_input(
+                "Warning threshold (%)",
+                min_value=0.0,
+                value=current_warning,
+                step=0.5,
+                key=f"threshold_{rule_name}_warning",
+            )
+
+        with col2:
+            critical_value = st.number_input(
+                "Critical threshold (%)",
+                min_value=0.0,
+                value=current_critical,
+                step=0.5,
+                key=f"threshold_{rule_name}_critical",
+            )
+
+        # Keep session state limited to actual overrides.
+        _update_threshold_override(
+            rule_name=rule_name,
+            field="warning",
+            value=float(warning_value),
+            default_value=default_warning,
+        )
+
+        _update_threshold_override(
+            rule_name=rule_name,
+            field="critical",
+            value=float(critical_value),
+            default_value=default_critical,
+        )
+
+        # Re-read after synchronization so the indicator is accurate.
+        is_custom = rule_name in st.session_state.threshold_overrides
+
+        if is_custom:
+            st.caption(
+                "Custom threshold  •  "
+                f"Default: Warning {default_warning:.2f}% | "
+                f"Critical {default_critical:.2f}%"
+            )
+
+        st.divider()
 
 # ----------------------------------------------------
 # KPI Display
@@ -1024,6 +1225,7 @@ def show_analysis_page() -> None:
     """Display the analysis page."""
 
     st.title("📈 Analysis")
+    _initialize_threshold_overrides()
 
     # ------------------------------------------------
     # Dataset Validation
@@ -1056,11 +1258,26 @@ def show_analysis_page() -> None:
         return
 
     # ------------------------------------------------
+    # Determine Applicable Rules
+    # ------------------------------------------------
+
+    kpis = calculate_kpis(
+        st.session_state.mapped_dataset
+    )
+
+    applicable_rules = get_applicable_rules(kpis)
+
+    _display_threshold_configuration(
+        applicable_rules
+    )
+
+    # ------------------------------------------------
     # Run Analytics Pipeline
     # ------------------------------------------------
 
     result = run_analysis(
-        st.session_state.mapped_dataset
+        st.session_state.mapped_dataset,
+        threshold_overrides=st.session_state.threshold_overrides,
     )
 
     st.session_state.analysis_result = result
